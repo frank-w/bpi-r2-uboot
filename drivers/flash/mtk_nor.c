@@ -510,7 +510,6 @@ static u8 mt53xx_nor_Region2Info(struct mt53xx_nor *mt53xx_nor, u32 offset, u32 
   }
 
   return info;
-  
 }
 
 static void mt53xx_nor_SetDualRead(struct mt53xx_nor *mt53xx_nor)
@@ -518,7 +517,6 @@ static void mt53xx_nor_SetDualRead(struct mt53xx_nor *mt53xx_nor)
   u8 attr = mt53xx_nor->host_act_attr;
   u8 dualread = mt53xx_nor->flash_info[0].u1DualREADCmd;
   u32 u4DualReg = SFLASH_RREG32(SFLASH_DUAL_REG);
-  
 
   /* make sure the same dual read command about two sflash
      */
@@ -544,7 +542,7 @@ static void mt53xx_nor_DisableDualRead(struct mt53xx_nor *mt53xx_nor)
   u8 attr = mt53xx_nor->host_act_attr;
   u8 dualread = mt53xx_nor->flash_info[0].u1DualREADCmd;
   u32 u4DualReg = SFLASH_RREG32(SFLASH_DUAL_REG);
-  
+
   if((attr & SFLASH_USE_DUAL_READ) &&
   	 (dualread != 0x00))
   {
@@ -1305,10 +1303,9 @@ static u32 mt53xx_nor_ReadPIO(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, 
   SFLASH_WREG8(SFLASH_RADR3_REG, HiByte(HiWord(addr)));
   SFLASH_WREG8(SFLASH_RADR2_REG, LoByte(HiWord(addr)));
   SFLASH_WREG8(SFLASH_RADR1_REG, HiByte(LoWord(addr)));
-  SFLASH_WREG8(SFLASH_RADR0_REG, LoByte(LoWord(addr))); 
-	
+  SFLASH_WREG8(SFLASH_RADR0_REG, LoByte(LoWord(addr)));
   for (i=0; i<len; i++, (*retlen)++)
-  {  
+  {
     mt53xx_nor->cur_cmd_val = 0x81;
     if(0 != mt53xx_nor_ExecuteCmd(mt53xx_nor))
     {
@@ -1316,10 +1313,9 @@ static u32 mt53xx_nor_ReadPIO(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, 
       ret = -1;
       goto done;
     }
-	
     buf[i] = SFLASH_RREG8(SFLASH_RDATA_REG); // Get data
-  } 
-	
+  }
+
   mt53xx_nor->cur_cmd_val = 0x00;
   mt53xx_nor_SendCmd(mt53xx_nor);
 
@@ -1342,7 +1338,6 @@ reMatch:
 			{
 				if(pattern_match>4)
 					break;
-				
 				if(buf[i]==0xAA)
 					pattern_match++;
 				else
@@ -1355,10 +1350,9 @@ reMatch:
 			delay_count++;
 			if(virt_addr_valid((u32)buf ))
 				{
-				 phyaddr = dma_map_single(NULL, buf, len, DMA_FROM_DEVICE);	
+				 phyaddr = dma_map_single(NULL, buf, len, DMA_FROM_DEVICE);
 				 dma_unmap_single(NULL, phyaddr, len, DMA_FROM_DEVICE);
 				}
-			
 			msleep(5);
 			goto reMatch;
 			}
@@ -1368,14 +1362,11 @@ reMatch:
 				printf("print error data:addr 0x%x len %d\n",buf,len);
 				for(i=0;i<len;i++)
 				{
-					
 					printf( "%02x ",buf[i]);
-				
 				}
 				printf("\n");
 			}
 			*/
-		
 }
 
 static void mt53xx_nor_cal_checksum(u32 addr,u8 *buf,u32 len)
@@ -1385,12 +1376,12 @@ static void mt53xx_nor_cal_checksum(u32 addr,u8 *buf,u32 len)
 	u8 nor_data;
 
 	nor_baseAddress=0xf8000000+addr;
-	
+
 	for(i=0;i<len;i++)
 		{
 			nor_data=nor_baseAddress[i];
 			if(buf[i]!=nor_data)
-				{			
+				{
 					buf[i]=nor_data;
 					count++;
 				}
@@ -1408,7 +1399,7 @@ static u32 mt53xx_nor_cmp_f8(u32 addr,u8 *buf,u32 len)
 		{
 			nor_data=nor_baseAddress[i];
 			if(buf[i]!=nor_data)
-				{			
+				{
 					count++;
 				}
 		}
@@ -1424,8 +1415,8 @@ static u32 mt53xx_nor_cmp_f8(u32 addr,u8 *buf,u32 len)
 
 #if !defined(__UBOOT_NOR__)
 static u32 mt53xx_nor_ReadDMA(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, u32 *retlen, u8 *buf)
-{ 
-  u32 phyaddr; 
+{
+  u32 phyaddr;
   u32 ret;
   u8 intvect;
   u32 dmareg;
@@ -1435,7 +1426,7 @@ static u32 mt53xx_nor_ReadDMA(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, 
   dmareg = 0xF00085A0;
 #endif
 
-  phyaddr = dma_map_single(NULL, buf, len, DMA_FROM_DEVICE);	
+  phyaddr = dma_map_single(NULL, buf, len, DMA_FROM_DEVICE);
 
 
 
@@ -1490,20 +1481,20 @@ static u32 mt53xx_nor_ReadDMA(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, 
 static u32 mt53xx_nor_Read(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, u32 *retlen, u8 *buf)
 {
   u32 ret = 0, len_align = 0/*, dram_addr_off = 0, i*/;
-  u8 info, attr;
+  u8 info/*, attr*/;
 
 
-  attr = mt53xx_nor->host_act_attr;
+  //attr = mt53xx_nor->host_act_attr;
 
   mt53xx_nor_PinMux();
 
   mt53xx_nor_SetDualRead(mt53xx_nor);
-	
+
   /* get rank-flash info of region indicated by addr and len
      */
   info = mt53xx_nor_Region2Info(mt53xx_nor, addr, len);
-	
-  /* Wait till previous write/erase is done. 
+
+  /* Wait till previous write/erase is done.
      */
   if(info & REGION_RANK_FIRST_FLASH)
   {
@@ -1524,89 +1515,79 @@ static u32 mt53xx_nor_Read(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, u32
       ret = -1;
       goto done;
     }
-  }  
-	
+  }
+
   /* read operation is going on
      */
   mt53xx_nor->cur_flash_index = 0;
-	
-  /* Disable pretch write buffer  
+
+  /* Disable pretch write buffer
      */
   if(0 != mt53xx_nor_WriteBufferDisable(mt53xx_nor))
   {
     printf( "disable write buffer in read process failed!\n");
     ret = -1;
-    goto done;    
+    goto done;
   }
 
 #if !defined(__UBOOT_NOR__)
   /* For only pio mode use, we don't care whether dma addr and len is 16byte align
      */
   if(attr & SFLASH_USE_DMA)
-  {	  
+  {
 	  if(virt_addr_valid((u32)buf ))  //buf address can be use for dma
 	  {
 		  dram_addr_off = (u32)buf - (((u32)buf)&(~0x0F));
-		  
 		  if(dram_addr_off)
 		  {
 			  //printf(".......entry mt53xx_nor_Read rdram_addr_off is nor zero!\n");
 			  len_align = 0x10 - dram_addr_off;
-			  
 			  if(len < 0x10 + len_align)
 			  {
 				  len_align = len;
 			  }
-			  	
 			  if(0 != mt53xx_nor_ReadPIO(mt53xx_nor, addr, len_align, retlen, buf))
 			  {
 				  printf( "read in pio mode #1 failed!\n");
 				  ret = -1;
-				  goto done;  
-			  } 
-		  
+				  goto done;
+			  }
+
 			  addr += len_align;
 			  len  -= len_align;
 			  buf  += len_align;
-		  } 	  
-	  
-			
+		  }
+
 		  if(len >= 0x10)
 		  {
-			  len_align = (len&(~0xF));  
-			  
+			  len_align = (len&(~0xF));
 			  if(0 != mt53xx_nor_ReadDMA(mt53xx_nor, addr, len_align, retlen, buf))
 			  {
 				  printf( "read in DMA mode failed!\n");
 				  ret = -1;
-				  goto done;  
+				  goto done;
 			  }
-			  
+
 			  addr += len_align;
 			  len  -= len_align;
 			  buf  += len_align;
-	  
-		  
 		  }
-	  
 	  }
 	  else		  //buf address can't be use for dma, we must use _pu1NorDataBuf for dma read
-	  {  
+	  {
 		  if(len >= 0x10)
 		  {
 			  len_align = (len&(~0xF));   //len_align is 16 aligns
-			  
 			  //printf("..............entry mt53xx_nor_Read len =0x%x len_align =0x%x buf =0x%x !\n",len, len_align, buf);
-		  
 			  len  -= len_align;
 			  //DMA read max size is 8k
-			  while(len_align > SFLASH_MAX_DMA_SIZE)	  
+			  while(len_align > SFLASH_MAX_DMA_SIZE)
 			  {
 				  if(0 != mt53xx_nor_ReadDMA(mt53xx_nor, addr, SFLASH_MAX_DMA_SIZE, retlen, _pu1NorDataBuf))
 				  {
 					printf( "read in DMA mode failed!\n");
 					ret = -1;
-					goto done;	
+					goto done;
 				  }
 				  memcpy(buf, _pu1NorDataBuf, SFLASH_MAX_DMA_SIZE);
 				  addr += SFLASH_MAX_DMA_SIZE;
@@ -1620,7 +1601,7 @@ static u32 mt53xx_nor_Read(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, u32
 				  {
 					  printf( "read in DMA mode failed!\n");
 					  ret = -1;
-					  goto done;  
+					  goto done;
 				  }
 				  memcpy(buf, _pu1NorDataBuf, len_align);
 				  addr += len_align;
@@ -1631,22 +1612,20 @@ static u32 mt53xx_nor_Read(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, u32
 
   }
 #endif // !defined(__UBOOT_NOR__)
- 
+
   if(len > 0)
   {
     len_align = len;
-	 
     if(0 != mt53xx_nor_ReadPIO(mt53xx_nor, addr, len_align, retlen, buf))
     {
       printf( "read in pio mode #2 failed!\n");
       ret = -1;
-      goto done;	  
-    }   
-	  
+      goto done;
+    }
     addr += len_align;
     len  -= len_align;
     buf += len_align;
-  } 
+  }
 
   mt53xx_nor_DisableDualRead(mt53xx_nor);
 done:
@@ -1692,7 +1671,7 @@ static u32 mt53xx_nor_read(struct mtd_info *mtd, loff_t from, size_t len, size_t
   struct mt53xx_nor *mt53xx_nor = mtd_to_mt53xx_nor(mtd);
 #endif
    u32 ret = 0/*, i*/;
-   //u32 phyaddr; 
+   //u32 phyaddr;
    u8 *readBuf;
    u32 readLen;
    //struct timespec tv,tv1;
@@ -1720,7 +1699,7 @@ static u32 mt53xx_nor_read(struct mtd_info *mtd, loff_t from, size_t len, size_t
 
 
   //mutex_lock(&mt53xx_nor->lock);
-  
+
  //make sure the 0xFF had been write to dram
 #ifdef MULTI_READ_DMA
 MultiRead:
@@ -1741,7 +1720,7 @@ MultiRead:
 				if(multiReadCounts==2)
 					readBuf=_pu1NorTemp1Buf;           //2nd dma read
 				else
-					printf("Nor: error read index\n");		
+					printf("Nor: error read index\n");
 			}
 		else
 			readBuf=_pu1NorDataBuf;            //1st dma read
@@ -2042,13 +2021,13 @@ static u32 mt53xx_nor_WriteSingleByte(struct mt53xx_nor *mt53xx_nor, u32 u4addr,
 
 
   return 0;
-  
+
 }
 
-static u32 mt53xx_nor_WriteBuffer(struct mt53xx_nor *mt53xx_nor, 
+static u32 mt53xx_nor_WriteBuffer(struct mt53xx_nor *mt53xx_nor,
 	                                      u32 u4addr, u32 u4len, const u8 *buf)
 {
-  u32 i, j, bufidx, data, addr;
+  u32 i, j, bufidx, data/*, addr*/;
   u8 index;
 
   if(buf == NULL)
@@ -2063,7 +2042,7 @@ static u32 mt53xx_nor_WriteBuffer(struct mt53xx_nor *mt53xx_nor,
   }
 
   index = mt53xx_nor->cur_flash_index;
-  addr = mt53xx_nor->cur_addr_offset;
+  //addr = mt53xx_nor->cur_addr_offset;
   SFLASH_WREG8(SFLASH_RADR3_REG, HiByte(HiWord(u4addr))); // Write
   SFLASH_WREG8(SFLASH_RADR2_REG, LoByte(HiWord(u4addr))); // Write
   SFLASH_WREG8(SFLASH_RADR1_REG, HiByte(LoWord(u4addr))); // Write
@@ -2085,7 +2064,7 @@ static u32 mt53xx_nor_WriteBuffer(struct mt53xx_nor *mt53xx_nor,
   {
     printf( "write buffer(offset:%08x flash#%d, sector index:%d, offset:%08x) failed!\n", 
 		                                                      u4addr, index, 
-		                                                      mt53xx_nor->cur_sector_index, 
+		                                                      mt53xx_nor->cur_sector_index,
 		                                                      mt53xx_nor->cur_addr_offset);
     return -1;
   }
@@ -2100,34 +2079,33 @@ static u32 mt53xx_nor_WriteBuffer(struct mt53xx_nor *mt53xx_nor,
   }
 
   return 0;
-  
 }
 
 static u32 mt53xx_nor_Write(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, u32 *retlen, const u8 *buf)
 {
   u32 i, ret = 0;
   u8 info;
-  
+
 #ifdef BD_NOR_ENABLE
   u32 count, pgalign = 0;
 #endif
 
   mt53xx_nor_PinMux();
-	  
+
   /* get rank-flash info of region indicated by addr and len
      */
 
   info = mt53xx_nor_Region2Info(mt53xx_nor, addr, len);
-	
+
   /*
-     * disable write protect of all related chips 
+     * disable write protect of all related chips
      * make sure all of related flash status is idle
      * make sure flash can be write
      */
   if(info & REGION_RANK_FIRST_FLASH)
   {
     mt53xx_nor->cur_flash_index = 0;
-	
+
     if(0 != mt53xx_nor_WriteProtect(mt53xx_nor, 0))
     {
       printf( "disable write protect of flash#0 failed!\n");
@@ -2135,7 +2113,7 @@ static u32 mt53xx_nor_Write(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, u3
       goto done;
     }
 
-   
+
     if(0 != mt53xx_nor_WaitBusy(mt53xx_nor, SFLASH_WRITEBUSY_TIMEOUT))
     {
       printf( "wait write busy of flash#0 failed!\n");
@@ -2152,7 +2130,7 @@ static u32 mt53xx_nor_Write(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, u3
 
 
   }
-	  
+
   if(info & REGION_RANK_SECOND_FLASH)
   {
     mt53xx_nor->cur_flash_index = 1;
@@ -2185,12 +2163,10 @@ static u32 mt53xx_nor_Write(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, u3
       printf( "write enable of flash#1 failed!\n");
       ret = -1;
       goto done;
-    }	
-
-
-  } 
+    }
+  }
 #ifdef BD_NOR_ENABLE
-  /* handle no-buffer-align case */ 
+  /* handle no-buffer-align case */
   pgalign = addr % SFLASH_WRBUF_SIZE;
   if(pgalign != 0)
   {
@@ -2205,16 +2181,16 @@ static u32 mt53xx_nor_Write(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, u3
       buf++;
       len--;
       (*retlen)++;
-	  
+
       if(len == 0)
       {
         ret = 0;
         len = (u32)len;
-        goto done;		
+        goto done;
       }
     }
   }
-	
+
   /* handle buffer case */
   if(mt53xx_nor_WriteBufferEnable(mt53xx_nor) != 0)
   {
@@ -2231,7 +2207,7 @@ static u32 mt53xx_nor_Write(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, u3
       // Not write-buffer alignment
       break;
     }
-	
+
     if(mt53xx_nor_WriteBuffer(mt53xx_nor, addr, count, buf) != 0)
     {
       if(mt53xx_nor_WriteBufferDisable(mt53xx_nor) != 0)
@@ -2241,7 +2217,7 @@ static u32 mt53xx_nor_Write(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, u3
       ret = -1;
       goto done;
     }
-		
+
     len -= count;
     (*retlen) += count;
     addr += count;
@@ -2252,7 +2228,7 @@ static u32 mt53xx_nor_Write(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, u3
     ret = -1;
     goto done;
   }
-	
+
   /* handle remain case */
   if((INT32)len > 0)
   {
@@ -2267,12 +2243,12 @@ static u32 mt53xx_nor_Write(struct mt53xx_nor *mt53xx_nor, u32 addr, u32 len, u3
         ret =  -1;
         goto done;
       }
-		  
+
       addr++;
       buf++;
     }
   }
-  
+
 #else
 
 
@@ -2321,18 +2297,15 @@ static u32 Get_Kernel_rootfs_checksum()
 
 	nor_baseAddress=0xf8000000+0x30000;
 	for(i=0;i<0x93;i++)
-		{
+	{
 		nor_baseAddress +=0x10000;
 		ichecksum=0;
 		for(j=0;j<0x10000;j++)
-			{
-				ichecksum +=nor_baseAddress[j];
-
-			}
-		
-		printf( "0X%08x checksum:0x%08x\n",nor_baseAddress,ichecksum);
-		
+		{
+			ichecksum +=nor_baseAddress[j];
 		}
+		printf( "0X%08x checksum:0x%08x\n",nor_baseAddress,ichecksum);
+	}
 
 }
 #endif
@@ -2366,7 +2339,7 @@ static u32 mt53xx_nor_write(struct mtd_info *mtd, loff_t to, size_t len, size_t 
   {
     return 0;
   }
-	
+
   //if (to + len > mt53xx_nor->mtd.size)
   if (to + len > mt53xx_nor->total_sz)
   {
@@ -2381,7 +2354,7 @@ static u32 mt53xx_nor_write(struct mtd_info *mtd, loff_t to, size_t len, size_t 
   //mutex_lock(&mt53xx_nor->lock);
 #if NOR_DEBUG
     printf( "%s (addr = %08x, len = %08x, retlen = %08x)\n",__FUNCTION__, (u32)to,(u32)len,(u32)(*retlen)); 
-#endif	
+#endif
 
   if(0 != mt53xx_nor_Write(mt53xx_nor, (u32)to, (u32)len, (u32 *)retlen, (u8 *)buf))
   {
@@ -2392,14 +2365,13 @@ static u32 mt53xx_nor_write(struct mtd_info *mtd, loff_t to, size_t len, size_t 
   }
  #if NOR_DEBUG
   do_gettimeofday(&t0);
-  printf( "[Time trace:%s(%d) time = %ld\n", __FUNCTION__,__LINE__,t0.tv_sec*1000+t0.tv_usec); 
-#endif	
+  printf( "[Time trace:%s(%d) time = %ld\n", __FUNCTION__,__LINE__,t0.tv_sec*1000+t0.tv_usec);
+#endif
 //done:
-	
+
   //mutex_unlock(&mt53xx_nor->lock);
 
   return ret;
-  
 }
 
 //static int mt53xx_nor_read(struct mtd_info *mtd, loff_t from, size_t len, size_t *retlen, u_char *buf)
@@ -2411,12 +2383,11 @@ int NORPART_Read(unsigned long long u8Offset, unsigned int u4MemPtr, unsigned in
   size_t len, retlen, size;
   static const char *part_parsers[] = {"cmdlinepart", NULL};
   //struct mtd_partition *parts;
-  
+
   // Find part offset and size.
   part = u8Offset >> 32;
   offset = u8Offset & 0xffffffff;
   if (part >= partnum)
-  
       return -EINVAL;
 
   if (offset >= mtdparts[part].size)
@@ -2434,7 +2405,7 @@ EXPORT_SYMBOL(NORPART_Read);
 static int  mt53xx_nor_RequestIrq(struct mt53xx_nor *mt53xx_nor)
 {
   u8 attr = mt53xx_nor->host_act_attr;
-  
+
   if(attr & SFLASH_USE_ISR)
   {
     if(0 != mt53xx_nor_RegIsr(mt53xx_nor))
@@ -2442,7 +2413,6 @@ static int  mt53xx_nor_RequestIrq(struct mt53xx_nor *mt53xx_nor)
       printf( "request flash isr failed!\n");
 	  return -1;
     }
-	
 	mt53xx_nor_SetIsr(mt53xx_nor);
   }
 
@@ -2458,7 +2428,7 @@ static inline int add_dynamic_parts(struct mtd_info *mtd)
 {
 #if 1
     static const char *part_parsers[] = {"cmdlinepart", NULL};
-    
+
     INT32 err;
 
     printf( "add_dynamic_parts\n");
@@ -2476,8 +2446,6 @@ static inline int add_dynamic_parts(struct mtd_info *mtd)
     }
 #endif
     return add_mtd_device(&mt53xx_nor->mtd);
-
-	
 }
 
 static int proc_read_protect_disable(char *page, char **start,
@@ -2485,7 +2453,7 @@ static int proc_read_protect_disable(char *page, char **start,
                              int *eof, void *data)
 {
     int  len;
-	printf( "enable_protect_ro=%d\n",enable_protect_ro);			
+	printf( "enable_protect_ro=%d\n",enable_protect_ro);
 	*eof = 1;
     return len;
 }
@@ -2494,10 +2462,8 @@ static int proc_write_protect_disable(struct file *file,
                              unsigned long count,
                              void *data)
 {
-	
 	enable_protect_ro=0;
 	printf( "Disable protect the READ_ONLY partition :enable_protect_ro=%d\n",enable_protect_ro);
-	
     return count;
 }
 static int proc_read_protect_2nd_nor(char *page, char **start,
@@ -2518,7 +2484,6 @@ static int proc_write_protect_2nd_nor(struct file *file,
                              unsigned long count,
                              void *data)
 {
-	
 	protect_2nd_nor=1;
 	printf( "Setting protect 2nd nor :protect_2nd_nor=%d\n",protect_2nd_nor);
     return count;
@@ -2541,7 +2506,7 @@ static int __init nor_init_procfs(void)
     }
     nor_write_enable->read_proc = proc_read_protect_disable;
     nor_write_enable->write_proc = proc_write_protect_disable;
-	//protect the 2nd nor flash 
+	//protect the 2nd nor flash
 	 nor_protect_2nd_nor = create_proc_entry("protect_2nd_nor", 0755, nor_proc_dir);
     if(nor_protect_2nd_nor == NULL) {
 		printf( "nor_write_enable create failed\n" );
@@ -2549,7 +2514,6 @@ static int __init nor_init_procfs(void)
     }
     nor_protect_2nd_nor->read_proc = proc_read_protect_2nd_nor;
     nor_protect_2nd_nor->write_proc = proc_write_protect_2nd_nor;
-	
 
     return 0;
  proc_init_fail:
@@ -2566,7 +2530,7 @@ static int __init nor_init_procfs(void)
  */
  #ifdef BD_NOR_ENABLE
 static int nor_block_isbad(struct mtd_info *mtd, loff_t offs)
-{	
+{
     return 0;
 }
 
@@ -2643,7 +2607,7 @@ static int __init mt53xx_nor_init(void)
   int ret = -ENODEV;
   int result;
   u8 status;
-  
+
 	{
 		unsigned char is33v;
 		unsigned int  val;
@@ -2687,28 +2651,28 @@ static int __init mt53xx_nor_init(void)
   printf( "<mt53xx_nor_init>hank:V0.6.9m(protect 0 flash)...\n");
 
   /*
-     * lock initialization
-     */
+   * lock initialization
+   */
   mutex_init(&mt53xx_nor->lock);
 
   mt53xx_nor->cur_flash_index = 0;
   mt53xx_nor->cur_cmd_val = 0;
 
   /*
-     * switch pinmux for nor flash
-     */
+   * switch pinmux for nor flash
+   */
   mt53xx_nor_PinMux();
 
   /*
-     * allow flash controller to send write/write status
-     * 
-     */
+   * allow flash controller to send write/write status
+   *
+   */
   SFLASH_WREG32(SFLASH_CFG1_REG, 0x20);
 
   /*
-     * wait nor controller idle before identify the emmc
-     * 
-     */
+   * wait nor controller idle before identify the emmc
+   *
+   */
 #ifndef BD_NOR_ENABLE
   mt53xx_nor_WaitHostIdle(mt53xx_nor);
 #else
@@ -2718,13 +2682,13 @@ static int __init mt53xx_nor_init(void)
   SFLASH_WRITE32(0xF00000B0, SFLASH_READ32(0xF00000B0) & ~0x3);
 #endif
   /*
-     * identify the all nor flash and get necessary information 
-     */
+   * identify the all nor flash and get necessary information
+   */
   mt53xx_nor_GetID(mt53xx_nor);
 
   /*
-     * disable write protect at first 
-     */
+   * disable write protect at first
+   */
   mt53xx_nor_WriteProtectAllChips(mt53xx_nor, 0);
 
   // protect the first Nor flash( partiton: "loader","kernel","root"
@@ -2732,7 +2696,6 @@ static int __init mt53xx_nor_init(void)
     if(0 != mt53xx_nor_WriteProtect(mt53xx_nor, 1))
     {
         printf( "Flash #%d: write protect disable failed!\n", mt53xx_nor->cur_flash_index);
-	 
     }
 	else
 	{
@@ -2767,7 +2730,6 @@ static int __init mt53xx_nor_init(void)
   mt53xx_nor->mtd.name = "mt53xx-nor";
 #endif
 
-  
   printf("mt53xx_nor->total_sz =0x%x !\n",mt53xx_nor->total_sz);
 
 #ifndef BD_NOR_ENABLE
@@ -2785,7 +2747,7 @@ static int __init mt53xx_nor_init(void)
   /* flash isr request
      */
   mt53xx_nor_RequestIrq(mt53xx_nor);
-#ifdef BD_NOR_ENABLE // BD test code flow 
+#ifdef BD_NOR_ENABLE // BD test code flow
   //test code
   #if 0
   int i= 0;
@@ -2797,16 +2759,14 @@ static int __init mt53xx_nor_init(void)
   //u_char * w_buf = kmalloc(0x100000, GFP_KERNEL);
   u_char * r_buf = kmalloc(0x200000, GFP_KERNEL);
   //printf("nor buf w_buf=0x%08x , r_buf=0x%08x!\n",w_buf,r_buf);
- 
   //mt53xx_nor_erase(&(mt53xx_nor->mtd), &instr);
-  
   //for(i=0; i<0x10000; i++)
   {
   //  w_buf[i] = (UINT8)(i&0xFF);
   }
-  
+
   //mt53xx_nor_write(&(mt53xx_nor->mtd), 0x1000000, 0x10000, &retlen, w_buf);
-  
+
   printf("read test strat total_sz =0x%x !\n",0x200000);
   mt53xx_nor_read(&(mt53xx_nor->mtd), 0x500000, 0x200000, &retlen, r_buf);
   printf("read test end total_sz =0x%x !\n",0x200000);
@@ -2814,7 +2774,7 @@ static int __init mt53xx_nor_init(void)
   {
    // printf("nor RW test fail!!! buf w_buf=0x%08x , r_buf=0x%08x!\n",w_buf,r_buf);
   }
-  
+
   //test code end
   #endif
 #endif
@@ -2823,7 +2783,7 @@ static int __init mt53xx_nor_init(void)
   //mt53xx_nor_SetDualRead(mt53xx_nor);
 
   /* register mtd partition layout
-     */  
+     */
 #ifdef BD_NOR_ENABLE
 
 //#if PARTITION_TABLE_INIT
@@ -2880,14 +2840,14 @@ static s32 _SetFlashExit4Byte(struct mt53xx_nor *mt53xx_nor)
 	u32 /*u4Index,*/ u4DualReg, u4Polling;
 	//u4Index = 0;
 
-	u4DualReg = SFLASH_RREG32(SFLASH_DUAL_REG); 
+	u4DualReg = SFLASH_RREG32(SFLASH_DUAL_REG);
 	u4DualReg &= ~0x10;
 	SFLASH_WREG32(SFLASH_DUAL_REG, u4DualReg);
 
 	u4Polling = 0;
 	while(1)
 	{
-		u4DualReg = SFLASH_RREG32(SFLASH_DUAL_REG); 
+		u4DualReg = SFLASH_RREG32(SFLASH_DUAL_REG);
 		if (!(u4DualReg & 0x10))
 		{
 			break;
@@ -2917,7 +2877,7 @@ static s32 _SetFlashExit4Byte(struct mt53xx_nor *mt53xx_nor)
 		SFLASH_WREG8(SFLASH_PRGDATA5_REG, 0xE9);	//Exit 4B cmd
 		SFLASH_WREG8(SFLASH_CNT_REG,8); 		// Write SF Bit Count
 	}
-   
+
 	mt53xx_nor->cur_cmd_val = 0x04;
 	if(-1 == mt53xx_nor_ExecuteCmd(mt53xx_nor))
 	{
@@ -2945,13 +2905,12 @@ static s32 _SetFlashEnter4Byte(struct mt53xx_nor *mt53xx_nor)
     {
 	printk("enter 4 byte mode write enable fail\n");
         return 1;
-    }	
+    }
 
-	
     if( (mt53xx_nor->flash_info[0].u1MenuID == 0x01) &&(mt53xx_nor->flash_info[0].u1DevID1 == 0x02) &&(mt53xx_nor->flash_info[0].u1DevID2 == 0x19) )	//for spansion S25FL256s flash
     {
         SFLASH_WREG8(SFLASH_PRGDATA5_REG, 0x17);	//Enter EN4B cmd
-        SFLASH_WREG8(SFLASH_PRGDATA4_REG, 0x80);	
+        SFLASH_WREG8(SFLASH_PRGDATA4_REG, 0x80);
         SFLASH_WREG8(SFLASH_CNT_REG,16); 			// Write SF Bit Count
     }
     else
@@ -2959,22 +2918,21 @@ static s32 _SetFlashEnter4Byte(struct mt53xx_nor *mt53xx_nor)
         SFLASH_WREG8(SFLASH_PRGDATA5_REG, 0xb7);	//Enter EN4B cmd
         SFLASH_WREG8(SFLASH_CNT_REG,8); 			// Write SF Bit Count
     }
-   
     mt53xx_nor->cur_cmd_val = 0x04;
     if(-1 == mt53xx_nor_ExecuteCmd(mt53xx_nor))
     {
         printk(KERN_ERR "4byte addr enable failed!\n");
         return -1;
     }
-	
-	u4DualReg = SFLASH_RREG32(SFLASH_DUAL_REG); 
+
+	u4DualReg = SFLASH_RREG32(SFLASH_DUAL_REG);
 	u4DualReg |= 0x10;
 	SFLASH_WREG32(SFLASH_DUAL_REG, u4DualReg);
 
     u4Polling = 0;
     while(1)
     {
-        u4DualReg = SFLASH_RREG32(SFLASH_DUAL_REG); 
+        u4DualReg = SFLASH_RREG32(SFLASH_DUAL_REG);
         if (0x10 == (u4DualReg & 0x10))
         {
             break;
@@ -2985,7 +2943,7 @@ static s32 _SetFlashEnter4Byte(struct mt53xx_nor *mt53xx_nor)
 	    printk("enter 4 byte mode polling fail\n");
             return 1;
         }
-    }	
+    }
 	//LOG(0, "...cdd Enter 4 bytes address!\n");
         printk(KERN_ERR "4byte addr enable done!\n");
 	return 0;
@@ -3019,7 +2977,7 @@ int mtk_nor_init(void)
 		NFI_GPIO_SET_FIELD(0x10005c00, 0xf,   0x0a);    /* TDSEL change value to 0x0a*/
 		NFI_GPIO_SET_FIELD(0x10005c00, 0x3f0, val);     /* RDSEL change value to val*/
 	}
-	
+
 	if (!mt53xx_nor)
 	{
  		mt53xx_nor = malloc(sizeof (*mt53xx_nor));
@@ -3036,10 +2994,10 @@ int mtk_nor_init(void)
   			return -ENOMEM;
 		}
   	}
-                    
+
  	mt53xx_nor->cur_flash_index = 0;
  	mt53xx_nor->cur_cmd_val = 0;
- 
+
   	/*
      	 * switch pinmux for nor flash
      	 */
@@ -3050,18 +3008,17 @@ int mtk_nor_init(void)
  	SFLASH_WREG32(SFLASH_WRPROT_REG, 0x30);
  	//set clock
  	SFLASH_WRITE32(0x100000B0, SFLASH_READ32(0x100000B0) & ~0x3); // to do: remove Hard code
-	
+
 	mt53xx_nor_GetID(mt53xx_nor);
 	printf("Roger debug: size=%x, flash_num=%d\n", mt53xx_nor->total_sz, mt53xx_nor->flash_num); // Roger debug
 
  	mt53xx_nor_WriteProtectAllChips(mt53xx_nor, 0);
 
 	mt53xx_nor->cur_flash_index = 0;
- 	
+
 	if(0 != mt53xx_nor_WriteProtect(mt53xx_nor, 1))
  	{
         	printf( "Flash #%d: write protect disable failed!\n", mt53xx_nor->cur_flash_index);
-	 
  	}
 	else
 	{
@@ -3079,7 +3036,8 @@ int mtk_nor_init(void)
 static int mtk_nor_command(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {
 	unsigned int addr;
-	int len, i, retlen = 0;
+	int len, i;
+	unsigned int retlen = 0;
 	u8 *p = NULL;
 
 	if (!strncmp(argv[1], "id", 3)) {
@@ -3100,13 +3058,13 @@ static int mtk_nor_command(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 		}
 
 		tmp_flash_info.u1DevID2 = SFLASH_RREG8(SFLASH_SHREG0_REG);
-		tmp_flash_info.u1DevID1 = SFLASH_RREG8(SFLASH_SHREG1_REG);	
+		tmp_flash_info.u1DevID1 = SFLASH_RREG8(SFLASH_SHREG1_REG);
 		tmp_flash_info.u1MenuID = SFLASH_RREG8(SFLASH_SHREG2_REG);
 		u4MenuID=tmp_flash_info.u1MenuID;
 
 		mt53xx_nor->cur_cmd_val = 0x00;
 		mt53xx_nor_SendCmd(mt53xx_nor);
-		printf( "Flash MenuID: %02x, DevID1: %02x, DevID2: %02x\n", 
+		printf( "Flash MenuID: %02x, DevID1: %02x, DevID2: %02x\n",
                                             tmp_flash_info.u1MenuID,
                                             tmp_flash_info.u1DevID1,
                                             tmp_flash_info.u1DevID2);
@@ -3167,7 +3125,6 @@ static int mtk_nor_command(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	}
 	else
 		printf("Usage:\n%s\n use \"help nor\" for detail!\n", cmdtp->usage);
-					     
 	return 0;
 }
 
@@ -3192,7 +3149,7 @@ U_BOOT_CMD(
 static int mtk_uboot_nor_command(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {
 	unsigned int addr;
-	int len, i, retlen = 0;
+	unsigned int len/*, i*/, retlen = 0;
 	u8 *p = NULL;
 
 	if (!strncmp(argv[1], "read", 5)) {
@@ -3233,7 +3190,6 @@ static int mtk_uboot_nor_command(cmd_tbl_t *cmdtp, int flag, int argc, char *arg
 	}
 	else
 		printf("Usage:\n%s\n use \"help nor\" for detail!\n", cmdtp->usage);
-					     
 	return 0;
 }
 

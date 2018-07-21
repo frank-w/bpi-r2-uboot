@@ -3684,26 +3684,24 @@ int msdc_tune_cmdrsp(struct mmc_host *host, struct mmc_command *cmd)
 						 if(msdc_abort_handler(host, 1))
 							 MSDC_ERR_PRINT(MSDC_ERROR,("[SD%d] abort failed\n",host->id));
 					 }
-				 }    
+				 }
                 cur_rrdly = (orig_rrdly + rrdly + 1) % 32;
                 MSDC_SET_FIELD(MSDC_PAD_TUNE, MSDC_PAD_TUNE_CMDRDLY, cur_rrdly);
             	} while (++rrdly < 32);
-			 if(!sel)
-			 	break;			 	
-			 	cur_cntr = (orig_cmdrtc + cntr + 1) % 8;
-                MSDC_SET_FIELD(MSDC_PATCH_BIT1, MSDC_PATCH_BIT1_CMD_RSP, cur_cntr);
+				if(!sel) break;
+		 		cur_cntr = (orig_cmdrtc + cntr + 1) % 8;
+            	MSDC_SET_FIELD(MSDC_PATCH_BIT1, MSDC_PATCH_BIT1_CMD_RSP, cur_cntr);
         	}while(++cntr < 8);
             /* no need to update data ck sel */
-            if (!sel)
-                break;        
+            if (!sel) break;
             cur_dl_cksel = (orig_dl_cksel +dl_cksel+1) % 8;
             MSDC_SET_FIELD(MSDC_PATCH_BIT0, MSDC_INT_DAT_LATCH_CK_SEL, cur_dl_cksel);
-            dl_cksel++;                
+            dl_cksel++;
         } while(dl_cksel < 8);
         /* no need to update ck sel */
 		if(result != MMC_ERR_NONE)
 			result = MMC_ERR_CMDTUNEFAIL;
-done:  
+done:
 
 	MSDC_TRC_PRINT(MSDC_TUNING,("[SD%d] <TUNE_CMD><%d><%s>\n",host->id, times, (result == MMC_ERR_NONE) ?"PASS" : "FAIL"));	
     return result;
@@ -3732,19 +3730,18 @@ int msdc_tune_bread(struct mmc_host *host, u8 *dst, u32 src, u32 nblks)
 
     if (host->sclk > 100000000)
         sel = 1;
-	if(host->card)
+	if (host->card)
     	ddr = mmc_card_ddr(host->card);
 	MSDC_GET_FIELD(MSDC_CFG,MSDC_CFG_CKMOD,orig_clkmode);
 	//if(orig_clkmode == 1)
-		//MSDC_SET_FIELD(MSDC_PATCH_BIT0, MSDC_CKGEN_RX_SDCLKO_SEL, 0);
-	
+	//MSDC_SET_FIELD(MSDC_PATCH_BIT0, MSDC_CKGEN_RX_SDCLKO_SEL, 0);
 	MSDC_GET_FIELD(MSDC_PATCH_BIT0, MSDC_CKGEN_MSDC_DLY_SEL, orig_dsel);
     MSDC_GET_FIELD(MSDC_PATCH_BIT0, MSDC_INT_DAT_LATCH_CK_SEL, orig_dl_cksel);
     MSDC_GET_FIELD(MSDC_IOCON, MSDC_IOCON_DSPL, orig_dsmpl);
-	
+
     /* Tune Method 2. delay each data line */
     MSDC_SET_FIELD(MSDC_IOCON, MSDC_IOCON_DDLSEL, 1);
- 
+
         dl_cksel = 0;
         do {
 			dsel = 0;
@@ -3758,7 +3755,7 @@ int msdc_tune_bread(struct mmc_host *host, u8 *dst, u32 src, u32 nblks)
 					if(result == MMC_ERR_CMDTUNEFAIL || result == MMC_ERR_CMD_RSPCRC || result == MMC_ERR_ACMD_RSPCRC)
 						goto done;
                     MSDC_GET_FIELD(SDC_DCRC_STS, SDC_DCRC_STS_POS|SDC_DCRC_STS_NEG, dcrc);
-					
+
                     if (!ddr) dcrc &= ~SDC_DCRC_STS_NEG;
 
                     /* for debugging */
