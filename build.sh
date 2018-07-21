@@ -17,16 +17,16 @@ CROSS_COMPILE=arm-linux-gnueabihf-
 U_CROSS_COMPILE=$CROSS_COMPILE
 J=$(grep ^processor /proc/cpuinfo  | wc -l )
 
-U_O_PATH=u-boot-mt
-U_CONFIG_H=$U_O_PATH/include/config.h
+U_O_PATH=
+U_CONFIG_H=include/config.h
 UBOOT_CONFIG=mt7623_evb_config
 
 logfile="$(dirname $0)/build.log"
 exec 3> >(tee $logfile)
 ret=1
 
-make -C u-boot-mt $UBOOT_CONFIG CROSS_COMPILE=$U_CROSS_COMPILE -j$J 2>&3 &&
-make -C u-boot-mt CROSS_COMPILE=$U_CROSS_COMPILE -j$J 2>&3 && ret=0
+make $UBOOT_CONFIG CROSS_COMPILE=$U_CROSS_COMPILE -j$J 2>&3 &&
+make CROSS_COMPILE=$U_CROSS_COMPILE -j$J 2>&3 && ret=0
 exec 3>&-
 if [ "$ret" -eq "0" ];
 then
