@@ -345,9 +345,14 @@
 #define CONFIG_MENU_ACTIVE_ENTRY            2
 #define CONFIG_UPGFILE			    "root_uImage"
 
-#define USB_BOOT_MENU 
-#define SDcard_BOOT_MENU 
-#define Browser_BOOT_MENU 
+#define CONFIG_CMDLINE_EDITING /* Command-line editing */
+#define CONFIG_AUTO_COMPLETE /* add autocompletion support */
+#define CONFIG_COMMAND_HISTORY /* command history */
+
+
+#define USB_BOOT_MENU
+#define SDcard_BOOT_MENU
+#define Browser_BOOT_MENU
 
 #define ENV_BOOT_CMD0 \
     "boot0=tftpboot; bootm\0"
@@ -441,15 +446,22 @@
     Browser_BOOT_MENU \
     SDcard_BOOT_MENU
 
+/*
 
+
+*/
 #define ENV_BOOT_MENU \
-    "bootmenu_0=1. System Load Linux to SDRAM via TFTP.=run boot0\0" \
-    "bootmenu_1=2. System Load Linux Kernel then write to Flash via TFTP.=run boot1\0" \
+    "bootmenu_0=1. Reload Bootmenu.=run reloadmenu\0" \
+    "bootmenu_1=2. Load Environment.=run newloadenv\0" \
     "bootmenu_2=3. Boot Linux from SD.=run boot10\0" \
-    "bootmenu_3=4. System Load Boot Loader then write to Flash via TFTP.=run boot3\0" \
-    "bootmenu_4=5. System Load Linux Kernel then write to Flash via Serial.=run boot4\0" \
-    "bootmenu_5=6. System Load Boot Loader then write to Flash via Serial.=run boot5\0" \
-    "bootmenu_6=7. Boot system code via Flash.=run boot2\0" \
+    "bootmenu_3=4. Boot Kernel 4.4.=run boot44\0" \
+    "bootmenu_4=5. Boot Kernel 4.9.=run boot49\0" \
+    "bootmenu_5=6. Boot Kernel 4.14.=run boot414\0" \
+    "bootmenu_6=7. Boot Kernel 4.16.=run boot416\0" \
+    "boot44=run newloadenv; setenv kernel ${kernel44}; printenv; run newboot\0" \
+    "boot49=run newloadenv; setenv kernel ${kernel49}; printenv; run newboot\0" \
+    "boot414=run newloadenv; setenv kernel ${kernel414}; printenv; run newboot\0" \
+    "boot416=run newloadenv; setenv kernel ${kernel416}; printenv; run newboot\0" \
     "bpiver=1\0" \
     "bpi=bananapi\0" \
     "board=bpi-r2\0" \
@@ -459,12 +471,20 @@
     "device=mmc\0" \
     "partition=1:1\0" \
     "kernel=uImage\0" \
+    "kernel44=uImage_4.4\0" \
+    "kernel49=uImage_4.9\0" \
+    "kernel414=uImage_4.14\0" \
+    "kernel416=uImage_4.16\0" \
     "root=/dev/mmcblk0p2\0" \
     "debug=7\0" \
     "bootenv=uEnv.txt\0" \
     "checksd=fatinfo ${device} 1:1\0" \
     "loadbootenv=fatload ${device} ${partition} ${scriptaddr} ${bpi}/${board}/${service}/${bootenv} || fatload ${device} ${partition} ${scriptaddr} ${bootenv}\0" \
     "boot_normal=if run checksd; then echo Boot from SD ; setenv partition 1:1; else echo Boot from eMMC ; mmc init 0 ; setenv partition 0:1 ; fi; if run loadbootenv; then echo Loaded environment from ${bootenv}; env import -t ${scriptaddr} ${filesize}; fi; run uenvcmd; fatload mmc 0:1 ${loadaddr} ${bpi}/${board}/${service}/${kernel}; bootm\0" \
+    "newloadenv=mmc init; run loadbootenv; env import -t ${scriptaddr} ${filesize};\0" \
+    "newboot=fatload mmc ${partition} ${loadaddr} ${bpi}/${board}/${service}/${kernel}; bootm\0" \
+    "reloadmenu=run newloadenv; bootmenu\0" \
+    "newchecksd=if run checksd; then echo Boot from SD ; setenv partition 1:1; else echo Boot from eMMC ; mmc init 0 ; setenv partition 0:1 ; fi;\0" \
     "bootmenu_delay=30\0" \
     ""
 
