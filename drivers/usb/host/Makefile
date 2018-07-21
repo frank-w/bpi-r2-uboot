@@ -31,7 +31,6 @@ obj-$(CONFIG_USB_EHCI_MX5) += ehci-mx5.o
 obj-$(CONFIG_USB_EHCI_MX6) += ehci-mx6.o
 obj-$(CONFIG_USB_EHCI_OMAP) += ehci-omap.o
 obj-$(CONFIG_USB_EHCI_PPC4XX) += ehci-ppc4xx.o
-obj-$(CONFIG_USB_EHCI_IXP4XX) += ehci-ixp.o
 obj-$(CONFIG_USB_EHCI_MARVELL) += ehci-marvell.o
 obj-$(CONFIG_USB_EHCI_PCI) += ehci-pci.o
 obj-$(CONFIG_USB_EHCI_SPEAR) += ehci-spear.o
@@ -39,6 +38,6 @@ obj-$(CONFIG_USB_EHCI_TEGRA) += ehci-tegra.o
 obj-$(CONFIG_USB_EHCI_VCT) += ehci-vct.o
 
 # xhci
-obj-$(CONFIG_USB_XHCI) += xhci.o xhci-mem.o xhci-ring.o
+obj-$(CONFIG_USB_XHCI) += xhci.o xhci-mem.o xhci-ring.o xhci-mtk.o xhci-mtk-power.o xhci-mtk-scheduler.o mtk-phy.o mtk-phy-ahb.o mtk-phy-7623.o
 obj-$(CONFIG_USB_XHCI_EXYNOS) += xhci-exynos5.o
 obj-$(CONFIG_USB_XHCI_OMAP) += xhci-omap.o

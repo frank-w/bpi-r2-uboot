@@ -97,9 +97,12 @@ int lzmaBuffToBuffDecompress (unsigned char *outStream, SizeT *uncompressedSize,
     g_Alloc.Alloc = SzAlloc;
     g_Alloc.Free = SzFree;
 
+#if 0   /* Nelson: workaround for LZMA */
     /* Short-circuit early if we know the buffer can't hold the results. */
     if (outSizeFull != (SizeT)-1 && *uncompressedSize < outSizeFull)
+        debug("LZMA: outSizeFull=0x%x, *uncompressedSize=0x%x\n", outSizeFull, *uncompressedSize);
         return SZ_ERROR_OUTPUT_EOF;
+#endif
 
     /* Decompress */
     outProcessed = outSizeFull;

@@ -107,6 +107,8 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+int             NetUipLoop = 0;
+
 /** BOOTP EXTENTIONS **/
 
 /* Our subnet mask (0=unknown) */
@@ -181,7 +183,8 @@ IPaddr_t	NetNtpServerIP;
 int		NetTimeOffset;
 #endif
 
-static uchar PktBuf[(PKTBUFSRX+1) * PKTSIZE_ALIGN + PKTALIGN];
+//static uchar PktBuf[(PKTBUFSRX+1) * PKTSIZE_ALIGN + PKTALIGN];
+volatile uchar PktBuf[(PKTBUFSRX+1) * PKTSIZE_ALIGN + PKTALIGN];
 
 /* Receive packet */
 uchar *NetRxPackets[PKTBUFSRX];
@@ -966,6 +969,9 @@ NetReceive(uchar *inpkt, int len)
 	NetRxPacket = inpkt;
 	NetRxPacketLen = len;
 	et = (struct ethernet_hdr *)inpkt;
+
+        if (NetUipLoop == 1)
+                return;
 
 	/* too small packet? */
 	if (len < ETHER_HDR_SIZE)

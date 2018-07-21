@@ -43,6 +43,7 @@ obj-$(CONFIG_ENV_IS_IN_NAND) += env_nand.o
 obj-$(CONFIG_ENV_IS_IN_NVRAM) += env_nvram.o
 obj-$(CONFIG_ENV_IS_IN_ONENAND) += env_onenand.o
 obj-$(CONFIG_ENV_IS_IN_SPI_FLASH) += env_sf.o
+obj-$(CONFIG_ENV_IS_IN_NOR) += env_nor.o
 obj-$(CONFIG_ENV_IS_IN_REMOTE) += env_remote.o
 obj-$(CONFIG_ENV_IS_IN_UBI) += env_ubi.o
 obj-$(CONFIG_ENV_IS_NOWHERE) += env_nowhere.o
@@ -64,6 +65,7 @@ obj-$(CONFIG_CMD_CONSOLE) += cmd_console.o
 obj-$(CONFIG_CMD_CPLBINFO) += cmd_cplbinfo.o
 obj-$(CONFIG_DATAFLASH_MMC_SELECT) += cmd_dataflash_mmc_mux.o
 obj-$(CONFIG_CMD_DATE) += cmd_date.o
+obj-$(CONFIG_CMD_DEMO) += cmd_demo.o
 obj-$(CONFIG_CMD_SOUND) += cmd_sound.o
 ifdef CONFIG_4xx
 obj-$(CONFIG_CMD_SETGETDCR) += cmd_dcr.o
@@ -81,9 +83,8 @@ obj-$(CONFIG_SYS_HUSH_PARSER) += cmd_exit.o
 obj-$(CONFIG_CMD_EXT4) += cmd_ext4.o
 obj-$(CONFIG_CMD_EXT2) += cmd_ext2.o
 obj-$(CONFIG_CMD_FAT) += cmd_fat.o
-obj-$(CONFIG_CMD_FDC)$(CONFIG_CMD_FDOS) += cmd_fdc.o
+obj-$(CONFIG_CMD_FDC) += cmd_fdc.o
 obj-$(CONFIG_OF_LIBFDT) += cmd_fdt.o fdt_support.o
-obj-$(CONFIG_CMD_FDOS) += cmd_fdos.o
 obj-$(CONFIG_CMD_FITUPD) += cmd_fitupd.o
 obj-$(CONFIG_CMD_FLASH) += cmd_flash.o
 ifdef CONFIG_FPGA
@@ -239,5 +240,3 @@ obj-y += memsize.o
 obj-y += stdio.o
 
 CFLAGS_env_embedded.o := -Wa,--no-warn -DENV_CRC=$(shell tools/envcrc 2>/dev/null)
-CFLAGS_hush.o := $(PLATFORM_NO_UNALIGNED)
-CFLAGS_fdt_support.o := $(PLATFORM_NO_UNALIGNED)

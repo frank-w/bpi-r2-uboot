@@ -38,14 +38,21 @@
 #include <post.h>
 #include <logbuff.h>
 #include <asm/sections.h>
+#include <asm/arch/mt_typedefs.h>
 
 #ifdef CONFIG_BITBANGMII
 #include <miiphy.h>
 #endif
 
+#if defined(CONFIG_CMD_NOR)
+#include "../../../drivers/flash/mtk_nor.h"
+#endif
+
 DECLARE_GLOBAL_DATA_PTR;
 
 ulong monitor_flash_len;
+
+extern int NetUipLoop;
 
 #ifdef CONFIG_HAS_DATAFLASH
 extern int  AT91F_DataflashInit(void);
@@ -105,8 +112,8 @@ static int display_banner(void)
 {
 	printf("\n\n%s\n\n", version_string);
 	debug("U-Boot code: %08lX -> %08lX  BSS: -> %08lX\n",
-	       _TEXT_BASE,
-	       _bss_start_ofs + _TEXT_BASE, _bss_end_ofs + _TEXT_BASE);
+	       (ulong)&_start,
+	       (ulong)&__bss_start, (ulong)&__bss_end);
 #ifdef CONFIG_MODEM_SUPPORT
 	debug("Modem Support enabled\n");
 #endif
@@ -273,13 +280,13 @@ void board_init_f(ulong bootflag)
 
 	memset((void *)gd, 0, sizeof(gd_t));
 
-	gd->mon_len = _bss_end_ofs;
+	gd->mon_len = (ulong)&__bss_end - (ulong)_start;
 #ifdef CONFIG_OF_EMBED
 	/* Get a pointer to the FDT */
 	gd->fdt_blob = __dtb_db_begin;
 #elif defined CONFIG_OF_SEPARATE
 	/* FDT is at end of image */
-	gd->fdt_blob = (void *)(_end_ofs + _TEXT_BASE);
+	gd->fdt_blob = &_end;
 #endif
 	/* Allow the early environment to override the fdt address */
 	gd->fdt_blob = (void *)getenv_ulong("fdtcontroladdr", 16,
@@ -318,7 +325,7 @@ void board_init_f(ulong bootflag)
 	gd->ram_size -= CONFIG_SYS_MEM_TOP_HIDE;
 #endif
 
-	addr = CONFIG_SYS_SDRAM_BASE + gd->ram_size;
+	addr = CONFIG_SYS_SDRAM_BASE + get_effective_memsize();
 
 #ifdef CONFIG_LOGBUFFER
 #ifndef CONFIG_ALT_LB_ADDR
@@ -451,7 +458,7 @@ void board_init_f(ulong bootflag)
 
 	gd->relocaddr = addr;
 	gd->start_addr_sp = addr_sp;
-	gd->reloc_off = addr - _TEXT_BASE;
+	gd->reloc_off = addr - (ulong)&_start;
 	debug("relocation Offset is: %08lx\n", gd->reloc_off);
 	if (new_fdt) {
 		memcpy(new_fdt, gd->fdt_blob, fdt_size);
@@ -506,6 +513,21 @@ static void display_fdt_model(const void *blob)
  ************************************************************************
  */
 
+
+#define MCUSYS_CFGREG_BASE           0x10200000
+#define L2C_SIZE_CFG_OFF 5
+
+/* config SRAM back from L2 cache for DA relocation */
+void config_shared_SRAM_size(void)
+{
+        volatile unsigned int cache_cfg;
+        /* set L2C size to 512KB */
+        cache_cfg = DRV_Reg(MCUSYS_CFGREG_BASE);
+        cache_cfg &= (~0x7) << L2C_SIZE_CFG_OFF;
+        cache_cfg |= 0x3 << L2C_SIZE_CFG_OFF;
+        DRV_WriteReg(MCUSYS_CFGREG_BASE, cache_cfg);
+}
+
 void board_init_r(gd_t *id, ulong dest_addr)
 {
 	ulong malloc_start;
@@ -516,7 +538,10 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	gd->flags |= GD_FLG_RELOC;	/* tell others: relocation done */
 	bootstage_mark_name(BOOTSTAGE_ID_START_UBOOT_R, "board_init_r");
 
-	monitor_flash_len = _end_ofs;
+	monitor_flash_len = (ulong)&__rel_dyn_end - (ulong)_start;
+
+	/* config SRAM back from L2 cache for DA relocation */
+	config_shared_SRAM_size();
 
 	/* Enable caches */
 	enable_caches();
@@ -582,6 +607,11 @@ void board_init_r(gd_t *id, ulong dest_addr)
 #if defined(CONFIG_CMD_NAND)
 	puts("NAND:  ");
 	nand_init();		/* go init the NAND */
+#endif
+
+#if defined(CONFIG_CMD_NOR)
+	puts("NOR:  ");
+	mtk_nor_init();		/* go init the NOR */
 #endif
 
 #if defined(CONFIG_CMD_ONENAND)
@@ -655,6 +685,7 @@ void board_init_r(gd_t *id, ulong dest_addr)
 #if defined(CONFIG_CMD_NET)
 	puts("Net:   ");
 	eth_initialize(gd->bd);
+	printf("Uip activated\n");
 #if defined(CONFIG_RESET_PHY_R)
 	debug("Reset Ethernet PHY\n");
 	reset_phy();

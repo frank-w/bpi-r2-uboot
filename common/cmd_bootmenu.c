@@ -262,7 +262,11 @@ static struct bootmenu_data *bootmenu_create(int delay)
 		return NULL;
 
 	menu->delay = delay;
+#if defined(CONFIG_MENU_ACTIVE_ENTRY)
+    menu->active = CONFIG_MENU_ACTIVE_ENTRY;
+#else
 	menu->active = 0;
+#endif
 	menu->first = NULL;
 
 	while ((option = bootmenu_getoption(i))) {
@@ -399,7 +403,7 @@ static void bootmenu_show(int delay)
 	}
 
 	/* Default menu entry is always first */
-	menu_default_set(menu, "0");
+	menu_default_set(menu, "3");
 
 	puts(ANSI_CURSOR_HIDE);
 	puts(ANSI_CLEAR_CONSOLE);

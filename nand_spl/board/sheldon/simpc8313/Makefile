@@ -7,6 +7,8 @@
 # SPDX-License-Identifier:	GPL-2.0+
 #
 
+include $(srctree)/$(src)/config.mk
+
 nandobj	:= $(OBJTREE)/nand_spl/
 
 LDSCRIPT= $(TOPDIR)/nand_spl/board/$(BOARDDIR)/u-boot.lds
@@ -28,10 +30,10 @@ targets += $(__OBJS)
 all: $(nandobj)u-boot-spl.bin $(nandobj)u-boot-spl-16k.bin
 
 $(nandobj)u-boot-spl-16k.bin:	$(nandobj)u-boot-spl
-	$(OBJCOPY) ${OBJCFLAGS} --pad-to=$(PAD_TO) -O binary $< $@
+	$(OBJCOPY) $(OBJCOPYFLAGS) --pad-to=$(PAD_TO) -O binary $< $@
 
 $(nandobj)u-boot-spl.bin:	$(nandobj)u-boot-spl
-	$(OBJCOPY) ${OBJCFLAGS} -O binary $< $@
+	$(OBJCOPY) $(OBJCOPYFLAGS) -O binary $< $@
 
 $(nandobj)u-boot-spl:	$(OBJS) $(nandobj)u-boot.lds
 	cd $(LNDIR) && $(LD) $(LDFLAGS) $(__OBJS) $(PLATFORM_LIBS) \

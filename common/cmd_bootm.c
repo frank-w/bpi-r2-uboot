@@ -514,8 +514,8 @@ static int do_bootm_standalone(int flag, int argc, char * const argv[],
 		setenv_hex("filesize", images->os.image_len);
 		return 0;
 	}
-	appl = (int (*)(int, char * const []))(ulong)ntohl(images->ep);
-	(*appl)(argc, argv);
+	appl = (int (*)(int, char * const []))images->ep;
+	appl(argc, argv);
 	return 0;
 }
 
@@ -623,6 +623,9 @@ static int do_bootm_states(cmd_tbl_t *cmdtp, int flag, int argc,
 	boot_os_fn *boot_fn;
 	ulong iflag = 0;
 	int ret = 0, need_boot_fn;
+
+    // Iverson debug
+    printf("bootm flag=%x, states=%x\n", flag, states);
 
 	images->state |= states;
 

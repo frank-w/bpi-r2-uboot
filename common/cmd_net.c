@@ -284,6 +284,45 @@ U_BOOT_CMD(
 );
 #endif
 
+#if defined(FW_UPGRADE_BY_WEBUI)
+static int do_http_upgrade(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+	if (argc < 2)
+		return -1;
+
+	NetPingIP = string_to_ip(argv[1]);
+	if (NetPingIP == 0)
+		return CMD_RET_USAGE;
+
+	if (NetLoop(PING) < 0) {
+		printf("ping failed; host %s is not alive\n", argv[1]);
+		if (NetLoop(PING) < 0) {
+			printf("ping failed again; host %s is not alive!!!\n", argv[1]);
+		}else{
+			printf("host %s is alive\n", argv[1]);
+		}
+	}else {
+
+		printf("host %s is alive\n", argv[1]);
+	}
+
+	///////////////////////////////////////////////////////
+	char *s;
+	if ((s = getenv("loadaddr")) != NULL) {
+		load_addr = simple_strtoul(s, NULL, 16);
+	}
+	printf("load_addr = %x\n", load_addr);
+	uip_main();
+	return 0;
+}
+
+U_BOOT_CMD(
+	http_upgrade,	2,	1,	do_http_upgrade,
+	"http_upgrade",
+	"pingAddress"
+);
+#endif
+
 #if defined(CONFIG_CMD_CDP)
 
 static void cdp_update_env(void)

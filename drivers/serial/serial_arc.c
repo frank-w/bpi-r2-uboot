@@ -38,8 +38,24 @@ static void arc_serial_setbrg(void)
 		gd->baudrate = CONFIG_BAUDRATE;
 
 	arc_console_baud = gd->cpu_clk / (gd->baudrate * 4) - 1;
-	writel(arc_console_baud & 0xff, &regs->baudl);
-	writel((arc_console_baud & 0xff00) >> 8, &regs->baudh);
+	writeb(arc_console_baud & 0xff, &regs->baudl);
+
+#ifdef CONFIG_ARC
+	/*
+	 * UART ISS(Instruction Set simulator) emulation has a subtle bug:
+	 * A existing value of Baudh = 0 is used as a indication to startup
+	 * it's internal state machine.
+	 * Thus if baudh is set to 0, 2 times, it chokes.
+	 * This happens with BAUD=115200 and the formaula above
+	 * Until that is fixed, when running on ISS, we will set baudh to !0
+	 */
+	if (gd->arch.running_on_hw)
+		writeb((arc_console_baud & 0xff00) >> 8, &regs->baudh);
+	else
+		writeb(1, &regs->baudh);
+#else
+	writeb((arc_console_baud & 0xff00) >> 8, &regs->baudh);
+#endif
 }
 
 static int arc_serial_init(void)
@@ -54,15 +70,15 @@ static void arc_serial_putc(const char c)
 	if (c == '\n')
 		arc_serial_putc('\r');
 
-	while (!(readl(&regs->status) & UART_TXEMPTY))
+	while (!(readb(&regs->status) & UART_TXEMPTY))
 		;
 
-	writel(c, &regs->data);
+	writeb(c, &regs->data);
 }
 
 static int arc_serial_tstc(void)
 {
-	return !(readl(&regs->status) & UART_RXEMPTY);
+	return !(readb(&regs->status) & UART_RXEMPTY);
 }
 
 static int arc_serial_getc(void)
@@ -71,16 +87,10 @@ static int arc_serial_getc(void)
 		;
 
 	/* Check for overflow errors */
-	if (readl(&regs->status) & UART_OVERFLOW_ERR)
+	if (readb(&regs->status) & UART_OVERFLOW_ERR)
 		return 0;
 
-	return readl(&regs->data) & 0xFF;
-}
-
-static void arc_serial_puts(const char *s)
-{
-	while (*s)
-		arc_serial_putc(*s++);
+	return readb(&regs->data) & 0xFF;
 }
 
 static struct serial_device arc_serial_drv = {
@@ -89,7 +99,7 @@ static struct serial_device arc_serial_drv = {
 	.stop	= NULL,
 	.setbrg	= arc_serial_setbrg,
 	.putc	= arc_serial_putc,
-	.puts	= arc_serial_puts,
+	.puts	= default_serial_puts,
 	.getc	= arc_serial_getc,
 	.tstc	= arc_serial_tstc,
 };

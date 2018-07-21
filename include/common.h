@@ -96,6 +96,10 @@ typedef volatile unsigned char	vu_char;
 #include <flash.h>
 #include <image.h>
 
+#ifdef __LP64__
+#define CONFIG_SYS_SUPPORT_64BIT_DATA
+#endif
+
 #ifdef DEBUG
 #define _DEBUG	1
 #else
@@ -206,6 +210,31 @@ typedef void (interrupt_handler_t)(void *);
 
 #define MIN3(x, y, z)  min3(x, y, z)
 #define MAX3(x, y, z)  max3(x, y, z)
+
+#define NUM_RX_DESC 24
+#define NUM_TX_DESC 24
+#define CONFIG_SYS_RX_ETH_BUFFER    60
+//NUM_RX_DESC
+
+typedef struct _BUFFER_ELEM_    BUFFER_ELEM;
+
+struct _BUFFER_ELEM_
+{
+	int tx_idx;
+    unsigned char *pbuf;
+    BUFFER_ELEM       *next;
+    
+    
+};
+
+typedef struct _VALID_BUFFER_STRUCT_    VALID_BUFFER_STRUCT;
+
+struct _VALID_BUFFER_STRUCT_
+{
+    BUFFER_ELEM    *head;
+    BUFFER_ELEM    *tail;	
+};
+
 
 /*
  * Return the absolute value of a number.
@@ -461,6 +490,7 @@ void	api_init (void);
 
 /* common/memsize.c */
 long	get_ram_size  (long *, long);
+phys_size_t get_effective_memsize(void);
 
 /* $(BOARD)/$(BOARD).c */
 void	reset_phy     (void);
@@ -970,6 +1000,22 @@ static inline phys_addr_t map_to_sysmem(const void *ptr)
 #define DIV_ROUND(n,d)		(((n) + ((d)/2)) / (d))
 #define DIV_ROUND_UP(n,d)	(((n) + (d) - 1) / (d))
 #define roundup(x, y)		((((x) + ((y) - 1)) / (y)) * (y))
+
+/*
+ * Divide positive or negative dividend by positive divisor and round
+ * to closest integer. Result is undefined for negative divisors and
+ * for negative dividends if the divisor variable type is unsigned.
+ */
+#define DIV_ROUND_CLOSEST(x, divisor)(			\
+{							\
+	typeof(x) __x = x;				\
+	typeof(divisor) __d = divisor;			\
+	(((typeof(x))-1) > 0 ||				\
+	 ((typeof(divisor))-1) > 0 || (__x) > 0) ?	\
+		(((__x) + ((__d) / 2)) / (__d)) :	\
+		(((__x) - ((__d) / 2)) / (__d));	\
+}							\
+)
 
 #define ALIGN(x,a)		__ALIGN_MASK((x),(typeof(x))(a)-1)
 #define __ALIGN_MASK(x,mask)	(((x)+(mask))&~(mask))

@@ -5,7 +5,9 @@
 # SPDX-License-Identifier:	GPL-2.0+
 #
 
-CROSS_COMPILE ?= arm-linux-
+ifeq ($(CROSS_COMPILE),)
+CROSS_COMPILE := arm-linux-
+endif
 
 ifndef CONFIG_STANDALONE_LOAD_ADDR
 ifneq ($(CONFIG_OMAP_COMMON),)
@@ -67,13 +69,8 @@ ifneq (,$(findstring -mabi=aapcs-linux,$(PLATFORM_CPPFLAGS)))
 # times. Also, the prefix needs to be different based on whether
 # CONFIG_SPL_BUILD is defined or not. 'filter-out' the existing entry
 # before adding the correct one.
-ifdef CONFIG_SPL_BUILD
-PLATFORM_LIBS := $(SPLTREE)/arch/arm/lib/eabi_compat.o \
-	$(filter-out %/arch/arm/lib/eabi_compat.o, $(PLATFORM_LIBS))
-else
-PLATFORM_LIBS := $(OBJTREE)/arch/arm/lib/eabi_compat.o \
-	$(filter-out %/arch/arm/lib/eabi_compat.o, $(PLATFORM_LIBS))
-endif
+PLATFORM_LIBS := arch/arm/lib/eabi_compat.o \
+	$(filter-out arch/arm/lib/eabi_compat.o, $(PLATFORM_LIBS))
 endif
 
 # needed for relocation
@@ -108,7 +105,17 @@ endif
 
 # limit ourselves to the sections we want in the .bin.
 ifdef CONFIG_ARM64
-OBJCFLAGS += -j .text -j .rodata -j .data -j .u_boot_list -j .rela.dyn
+OBJCOPYFLAGS += -j .text -j .rodata -j .data -j .u_boot_list -j .rela.dyn
 else
-OBJCFLAGS += -j .text -j .rodata -j .hash -j .data -j .got.plt -j .u_boot_list -j .rel.dyn
+OBJCOPYFLAGS += -j .text -j .rodata -j .hash -j .data -j .got.plt -j .u_boot_list -j .rel.dyn
+endif
+
+ifneq ($(CONFIG_IMX_CONFIG),)
+ifdef CONFIG_SPL
+ifndef CONFIG_SPL_BUILD
+ALL-y += SPL
+endif
+else
+ALL-y += u-boot.imx
+endif
 endif

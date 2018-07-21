@@ -157,10 +157,10 @@ ifeq ($(LOGO_BMP),)
 LOGO_BMP= $(srctree)/$(src)/logos/denx.bmp
 
 # Use board logo and fallback to vendor
-ifneq ($(wildcard logos/$(BOARD).bmp),)
+ifneq ($(wildcard $(srctree)/$(src)/logos/$(BOARD).bmp),)
 LOGO_BMP= $(srctree)/$(src)/logos/$(BOARD).bmp
 else
-ifneq ($(wildcard logos/$(VENDOR).bmp),)
+ifneq ($(wildcard $(srctree)/$(src)/logos/$(VENDOR).bmp),)
 LOGO_BMP= $(srctree)/$(src)/logos/$(VENDOR).bmp
 endif
 endif
@@ -191,3 +191,15 @@ $(LOGO_DATA_H):	$(obj)/bmp_logo $(LOGO_BMP)
 
 # Let clean descend into subdirs
 subdir- += env
+
+ifneq ($(CROSS_BUILD_TOOLS),)
+HOSTCC = $(CC)
+
+quiet_cmd_crosstools_strip = STRIP   $^
+      cmd_crosstools_strip = $(STRIP) $^; touch $@
+$(obj)/.strip: $(call objectify,$(filter $(always),$(hostprogs-y)))
+	$(call cmd,crosstools_strip)
+
+always += .strip
+endif
+clean-files += .strip

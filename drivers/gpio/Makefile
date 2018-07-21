@@ -5,9 +5,12 @@
 # SPDX-License-Identifier:	GPL-2.0+
 #
 
+obj-$(CONFIG_DM_GPIO)		+= gpio-uclass.o
+
 obj-$(CONFIG_AT91_GPIO)	+= at91_gpio.o
 obj-$(CONFIG_INTEL_ICH6_GPIO)	+= intel_ich6_gpio.o
 obj-$(CONFIG_KIRKWOOD_GPIO)	+= kw_gpio.o
+obj-$(CONFIG_KONA_GPIO)	+= kona_gpio.o
 obj-$(CONFIG_MARVELL_GPIO)	+= mvgpio.o
 obj-$(CONFIG_MARVELL_MFP)	+= mvmfp.o
 obj-$(CONFIG_MXC_GPIO)	+= mxc_gpio.o
@@ -30,4 +33,5 @@ obj-$(CONFIG_S3C2440_GPIO)	+= s3c2440_gpio.o
 obj-$(CONFIG_XILINX_GPIO)	+= xilinx_gpio.o
 obj-$(CONFIG_ADI_GPIO2)	+= adi_gpio2.o
 obj-$(CONFIG_TCA642X)		+= tca642x.o
-oby-$(CONFIG_SX151X)		+= sx151x.o
+obj-$(CONFIG_SX151X)		+= sx151x.o
+obj-$(CONFIG_MTGPIO)		+= mt_gpio.o
