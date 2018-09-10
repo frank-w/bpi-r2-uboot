@@ -1,0 +1,9 @@
+*.o
+*.cmd
+*.su
+*~
+*.old
+
+include/generated/
+lib/asm-offsets.s
+include/config/uboot.release
