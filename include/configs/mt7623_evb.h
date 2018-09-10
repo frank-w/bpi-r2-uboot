@@ -28,7 +28,7 @@
  **********************************************************************************************/
 #if 1
 /*
- *  Iverson 20140326 : 
+ *  Iverson 20140326 :
  *      We can disable dcache for accessing non-cachable address instead of using mmu page table to provide noncachable address.
  */
 /* Cache */
@@ -44,7 +44,7 @@
  **********************************************************************************************/
 /* Memory layout */
 /* DRAM definition */
-/* 
+/*
  * Iverson 20140521 : We detect ram size automatically.
  *      CONFIG_SYS_SDRAM_SIZE define max uboot size.
  *      The max size that auto detection support is 256MB.
@@ -131,9 +131,9 @@
 #define CONFIG_SYS_NO_FLASH
 
 /* NAND Flash Configuration */
-#define CONFIG_SYS_MAX_NAND_DEVICE	        1	
+#define CONFIG_SYS_MAX_NAND_DEVICE	        1
 #define CONFIG_SYS_NAND_BASE                NFI_BASE
-#define CONFIG_SYS_MAX_FLASH_SECT			256	
+#define CONFIG_SYS_MAX_FLASH_SECT			256
 #define CONFIG_SYS_MAX_FLASH_BANKS			1
 #define CONFIG_CMD_NAND
 //#define CONFIG_MTD_DEBUG
@@ -209,11 +209,11 @@
 
 #define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_ENV_SIZE                     SZ_4K
-#define CONFIG_ENV_OFFSET                   0x600 
+#define CONFIG_ENV_OFFSET                   0x600
 #define CONFIG_SYS_MMC_ENV_DEV              0
 #define CONFIG_SYS_MAX_FLASH_SECT           512
 
-#define CONFIG_EMMC_UBOOT_BLOCK             0x200 
+#define CONFIG_EMMC_UBOOT_BLOCK             0x200
 #define CONFIG_MAX_UBOOT_SIZE               0x200           // 0x200 * 512 = 256KB
 #define CONFIG_EMMC_LINUX_BLOCK             0xA00
 #define CONFIG_EMMC_RECOVERY_BLOCK          0x10A00
@@ -259,7 +259,7 @@
 
 #define CONFIG_ENV_IS_IN_SD
 #define CONFIG_ENV_SIZE                     SZ_128K
-#define CONFIG_ENV_OFFSET                   0xD2800 
+#define CONFIG_ENV_OFFSET                   0xD2800
 #define CONFIG_SYS_MMC_ENV_DEV              1
 
 #define ENV_BOOT_FROM_SD  \
@@ -457,11 +457,9 @@
     "bootmenu_3=4. Boot Kernel 4.4.=run boot44\0" \
     "bootmenu_4=5. Boot Kernel 4.9.=run boot49\0" \
     "bootmenu_5=6. Boot Kernel 4.14.=run boot414\0" \
-    "bootmenu_6=7. Boot Kernel 4.16.=run boot416\0" \
     "boot44=run newloadenv; setenv kernel ${kernel44}; printenv; run newboot\0" \
     "boot49=run newloadenv; setenv kernel ${kernel49}; printenv; run newboot\0" \
     "boot414=run newloadenv; setenv kernel ${kernel414}; printenv; run newboot\0" \
-    "boot416=run newloadenv; setenv kernel ${kernel416}; printenv; run newboot\0" \
     "bpiver=1\0" \
     "bpi=bananapi\0" \
     "board=bpi-r2\0" \
@@ -474,7 +472,6 @@
     "kernel44=uImage_4.4\0" \
     "kernel49=uImage_4.9\0" \
     "kernel414=uImage_4.14\0" \
-    "kernel416=uImage_4.16\0" \
     "root=/dev/mmcblk0p2\0" \
     "debug=7\0" \
     "bootenv=uEnv.txt\0" \
@@ -524,10 +521,10 @@
 #define CONFIG_SYS_HUSH_PARSER
 
 /* Compression */
-/* 
- * Iverson 20150408 :  
+/*
+ * Iverson 20150408 :
  *      We use kernel to decompress kernel.
  */
-//#define CONFIG_LZMA                             
+//#define CONFIG_LZMA
 
 #endif
