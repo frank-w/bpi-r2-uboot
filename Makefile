@@ -205,9 +205,6 @@ ifeq ($(HOSTARCH),$(ARCH))
 CROSS_COMPILE ?=
 endif
 
-CROSS_COMPILE_PATH = /opt/buildroot-gcc463_arm/usr/bin
-CROSS_COMPILE = $(CROSS_COMPILE_PATH)/arm-buildroot-linux-uclibcgnueabi-
-
 # SHELL used by kbuild
 CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 	  else if [ -x /bin/bash ]; then echo /bin/bash; \
